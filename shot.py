@@ -2,8 +2,6 @@ import pygame
 from circleshape import CircleShape
 from constants import SHOT_RADIUS, LINE_WIDTH
 
-Shot.containers = (shots, updatable, drawable)
-
 # Shot class representing a projectile fired by the player
 class Shot(CircleShape):
     def __init__(self, x, y):
@@ -12,12 +10,11 @@ class Shot(CircleShape):
     def draw(self, screen):
         pygame.draw.circle(
             screen,
-            "white",
+            "red",
             self.position,
             self.radius,
             LINE_WIDTH
         )
 
     def update(self, dt):
-        print("Updating shot position", self.position)
         self.position += self.velocity * dt
