@@ -9,6 +9,15 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_cooldown_timer = 0.0
+        self.lives = PLAYER_LIVES
+
+    def respawn(self):
+        """Reset position and state for a respawn."""
+        self.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.velocity = pygame.Vector2(0, 0)
+        self.rotation = 0
+        # reset shoot cooldown so player can react immediately
+        self.shoot_cooldown_timer = 0.0
 
     def triangle(self):
         forward = pygame.Vector2(0, -1).rotate(self.rotation)
@@ -31,10 +40,13 @@ class Player(CircleShape):
         self.rotation += PLAYER_TURN_SPEED * dt
 
     def move(self, dt):
-        unit_vector = pygame.Vector2(0, -1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
-        self.position += rotated_with_speed_vector
+        """Apply acceleration in the facing direction. If dt is negative, apply reverse acceleration."""
+        forward = pygame.Vector2(0, -1).rotate(self.rotation)
+        # dt acts as a signed scalar here (positive to accelerate forward)
+        self.velocity += forward * (PLAYER_ACCELERATION * dt)
+        # clamp to max speed
+        if self.velocity.length() > PLAYER_MAX_SPEED:
+            self.velocity.scale_to_length(PLAYER_MAX_SPEED)
 
     def shoot(self, dt):
         if self.shoot_cooldown_timer > 0:
@@ -60,6 +72,19 @@ class Player(CircleShape):
         
         if keys[pygame.K_SPACE]:
             self.shoot(dt)
+
+        # integrate velocity into position
+        self.position += self.velocity * dt
+
+        # simple linear drag to slowly reduce velocity when not accelerating
+        drag_factor = max(0.0, 1.0 - PLAYER_DRAG * dt)
+        self.velocity *= drag_factor
+
+        # wrap player around screen if necessary
+        try:
+            self.wrap_around()
+        except Exception:
+            pass
 
         # decrease shoot cooldown timer
         self.shoot_cooldown_timer = max(0.0, self.shoot_cooldown_timer - dt)

@@ -3,6 +3,7 @@ import pygame
 from circleshape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
 from logger import log_event
+from explosion import Explosion
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
@@ -21,6 +22,8 @@ class Asteroid(CircleShape):
         # If asteroid is too small, just remove it
         if self.radius <= ASTEROID_MIN_RADIUS:
             log_event("asteroid_destroyed")
+            # create an explosion effect at the position
+            Explosion(self.position.x, self.position.y, max_radius=self.radius * 1.2)
             self.kill()
             return
 
@@ -28,6 +31,9 @@ class Asteroid(CircleShape):
         old_radius = self.radius
         new_radius = old_radius - ASTEROID_MIN_RADIUS
         log_event("asteroid_split")
+
+        # small split puff
+        Explosion(self.position.x, self.position.y, max_radius=new_radius * 0.8, duration=0.35, color=(255,200,80))
 
         # spawn new asteroids at roughly the same position
         a1 = Asteroid(self.position.x, self.position.y, new_radius)
