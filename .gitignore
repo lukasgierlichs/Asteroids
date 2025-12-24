@@ -1,12 +1,28 @@
-# Python-generated files
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Python cache / builds
 __pycache__/
-*.py[oc]
+*.py[cod]
+*.egg-info/
 build/
 dist/
-wheels/
-*.egg-info
-game_state*
-game_events.jsonl
+.pytest_cache/
+.mypy_cache/
 
-# Virtual environments
-.venv
+# Runtime logs / user data
+game_state.jsonl
+game_events.jsonl
+leaderboard.json
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+htmlcov/
